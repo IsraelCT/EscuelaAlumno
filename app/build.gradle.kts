@@ -2,6 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    kotlin("kapt")
+    id ("com.google.dagger.hilt.android")
+
+
 }
 
 android {
@@ -40,6 +44,21 @@ android {
 }
 
 dependencies {
+    //  Dagger Hilt
+    implementation ("com.google.dagger:hilt-android:2.46.1")
+    kapt ("com.google.dagger:hilt-compiler:2.46.1")
+
+    //Navigation
+    val nav_version = "2.6.0"
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    // Retrofit
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    //Coil
+    implementation ("io.coil-kt:coil-compose:1.4.0")
+
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
