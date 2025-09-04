@@ -28,3 +28,4 @@ object AppModule {
     fun providesEscuelaAlumnoApi(retrofit: Retrofit) : EscuelaAlumnoApi{
     return retrofit.create(EscuelaAlumnoApi ::class.java)
 }
+    }
