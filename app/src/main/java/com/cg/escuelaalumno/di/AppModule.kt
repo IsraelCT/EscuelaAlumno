@@ -1,6 +1,7 @@
 package com.cg.escuelaalumno.di
 import com.cg.escuelaalumno.data.EscuelaAlumnoApi
-import com.cg.escuelaalumno.utils.Constans.Companion.BASE_URL
+import com.cg.escuelaalumno.utils.Constants
+import com.cg.escuelaalumno.utils.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,7 +19,7 @@ object AppModule {
     @Provides
     fun providesRetrofit() : Retrofit{
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(Constants.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

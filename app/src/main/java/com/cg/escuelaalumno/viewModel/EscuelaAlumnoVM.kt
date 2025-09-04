@@ -21,13 +21,9 @@ class EscuelaAlumnoVM @Inject constructor(
     private val _escuelaAlumno = MutableStateFlow<AlumnoResponse?>(null)
     val escuelaAlumno = _escuelaAlumno.asStateFlow()
 
-    init {
-        fetchEscuelaAlumno()
-    }
-
-    private fun fetchEscuelaAlumno() {
+    fun fetchAlumnoPorId(id: Int) {
         viewModelScope.launch {
-            val result = escuelaAlumnoRepository.getAlumnoDatos()
+            val result = escuelaAlumnoRepository.getAlumnoDatosporId(id)
             _escuelaAlumno.value = result
         }
     }

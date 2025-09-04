@@ -1,11 +1,11 @@
 package com.cg.escuelaalumno.data
 
 import com.cg.escuelaalumno.model.AlumnoResponse
-import com.cg.escuelaalumno.utils.Constans.Companion.ENDPOINT
 import retrofit2.http.GET
 import retrofit2.Response
+import retrofit2.http.Path
 
 interface EscuelaAlumnoApi {
-@GET(ENDPOINT )
-suspend fun  getAlumnoDatos(): Response<AlumnoResponse>
+    @GET("alumnos/datos/{id}")
+    suspend fun getAlumnoDatosPorId(@Path("id") id: Int): Response<AlumnoResponse>
 }

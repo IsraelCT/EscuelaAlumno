@@ -45,12 +45,14 @@ android {
 
 dependencies {
     //  Dagger Hilt
-    implementation ("com.google.dagger:hilt-android:2.46.1")
-    kapt ("com.google.dagger:hilt-compiler:2.46.1")
+    //implementation ("com.google.dagger:hilt-android:2.46.1")
+    //kapt ("com.google.dagger:hilt-compiler:2.46.1")
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-compiler:2.48")
 
     //Navigation
-    val nav_version = "2.6.0"
-    implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
     // Retrofit
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
@@ -58,7 +60,8 @@ dependencies {
     //Coil
     implementation ("io.coil-kt:coil-compose:1.4.0")
 
-
+    //Iconos
+    implementation("androidx.compose.material:material-icons-extended:1.5.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

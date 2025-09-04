@@ -1,6 +1,7 @@
 package com.cg.escuelaalumno
 
 import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
 
-class EscuelaAlumnoApplication: Application() {
-}
+@HiltAndroidApp
+class EscuelaAlumnoApplication: Application()

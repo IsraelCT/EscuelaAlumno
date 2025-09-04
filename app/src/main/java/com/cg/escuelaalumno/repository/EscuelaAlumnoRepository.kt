@@ -5,8 +5,8 @@ import com.cg.escuelaalumno.model.AlumnoResponse
 import javax.inject.Inject
 
 class EscuelaAlumnoRepository @Inject constructor(private  val escuelaAlumnoApi: EscuelaAlumnoApi  ){
-    suspend fun getAlumnoDatos(): AlumnoResponse?{
-        val response = escuelaAlumnoApi.getAlumnoDatos()
+    suspend fun getAlumnoDatosporId(id : Int): AlumnoResponse?{
+        val response = escuelaAlumnoApi.getAlumnoDatosPorId(id = id )
         return if (response.isSuccessful){
             response.body()
         }
