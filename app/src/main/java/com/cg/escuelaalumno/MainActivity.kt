@@ -12,7 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.cg.escuelaalumno.ui.theme.EscuelaAlumnoTheme
-import com.cg.escuelaalumno.view.HomeView
+import com.cg.escuelaalumno.view.HomeDrawerView
+
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -23,7 +24,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             EscuelaAlumnoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    HomeView(alumnoId = 5589)
+                    HomeDrawerView(alumnoId = 5589)
                 }
             }
         }

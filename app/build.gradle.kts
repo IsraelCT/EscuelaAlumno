@@ -54,6 +54,7 @@ dependencies {
 
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
+
     // Retrofit
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
 
@@ -62,6 +63,9 @@ dependencies {
 
     //Iconos
     implementation("androidx.compose.material:material-icons-extended:1.5.0")
+
+    //Animacion iconos
+    implementation("com.airbnb.android:lottie-compose:6.0.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
