@@ -1,5 +1,6 @@
 package com.cg.escuelaalumno.view
 
+import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -7,8 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,9 +32,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import com.cg.escuelaalumno.di.ID_ALUMNO_KEY
+import com.cg.escuelaalumno.di.USER_TOKEN_KEY
+import com.cg.escuelaalumno.di.dataStore
+import com.cg.escuelaalumno.navigation.Pantalla
 import com.cg.escuelaalumno.navigation.SeccionDrawer
 import com.cg.escuelaalumno.navigation.itemsDrawer
 import com.cg.escuelaalumno.viewModel.EscuelaAlumnoVM
@@ -38,7 +49,11 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeDrawerView(alumnoId: Int) {
+fun HomeDrawerView(
+    alumnoId: Int,
+    navController: NavController, // 👈 lo recibimos para navegar al login
+    context: Context = LocalContext.current
+) {
     val viewModel: EscuelaAlumnoVM = hiltViewModel()
     LaunchedEffect(alumnoId) { viewModel.fetchAlumnoPorId(alumnoId) }
     val alumnoState = viewModel.escuelaAlumno.collectAsStateWithLifecycle().value
@@ -52,6 +67,8 @@ fun HomeDrawerView(alumnoId: Int) {
         drawerContent = {
             ModalDrawerSheet {
                 Spacer(Modifier.height(16.dp))
+
+                // Items normales del Drawer
                 itemsDrawer.forEach { item ->
                     NavigationDrawerItem(
                         icon = { Icon(item.icono, contentDescription = item.etiqueta) },
@@ -64,13 +81,40 @@ fun HomeDrawerView(alumnoId: Int) {
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                     )
                 }
+
+                Divider()
+
+                // 👇 Item de Cerrar sesión
+                NavigationDrawerItem(
+                    icon = { Icon(Icons.Default.ExitToApp, contentDescription = "Cerrar sesión") },
+                    label = { Text("Cerrar sesión") },
+                    selected = false,
+                    onClick = {
+                        scope.launch {
+                            // Limpia credenciales (ejemplo con DataStore)
+                            context.dataStore.edit { prefs ->
+                                prefs.remove(USER_TOKEN_KEY)
+                                prefs.remove(ID_ALUMNO_KEY)
+                            }
+
+                            drawerState.close()
+
+                            // Navega al login y limpia el backstack
+                            navController.navigate(Pantalla.Login.ruta) {
+                                popUpTo(Pantalla.Home.ruta) { inclusive = true }
+                            }
+
+                        }
+                    },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
             }
         }
     ) {
-        Scaffold (
+        Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Perfil del alumno") },
+                    title = { Text("Computación del Golfo") },
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
                             Icon(Icons.Default.Menu, contentDescription = "Menú")
@@ -80,18 +124,14 @@ fun HomeDrawerView(alumnoId: Int) {
             }
         ) { padding ->
             alumnoState?.let { alumno ->
-                Column(modifier = Modifier.padding(padding).padding(24.dp)) {
+                Column(
+                    modifier = Modifier
+                        .padding(padding)
+                        .padding(24.dp)
+                ) {
                     when (seccionActiva.value) {
-                        SeccionDrawer.PERFIL -> {
-                            Text("👩‍🎓 ${alumno.alumno.nombre} ${alumno.alumno.apellidos}")
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text("Grupo: ${alumno.grupo.clave}")
-                            Text("Horario: ${alumno.grupo.horario}")
-                            Text("Docente: ${alumno.grupo.docente}")
-                        }
-                        SeccionDrawer.CALIFICACIONES -> {
-                          CalificacionesView(alumnoId)
-                        }
+                        SeccionDrawer.PERFIL -> PerfilCard(alumno)
+                        SeccionDrawer.CALIFICACIONES -> CalificacionesView(alumnoId)
                         SeccionDrawer.MATERIAS -> {
                             alumno.materias.forEach {
                                 Text("- ${it.nombre}: ${it.duracion} semanas")
@@ -104,7 +144,10 @@ fun HomeDrawerView(alumnoId: Int) {
                         }
                     }
                 }
-            } ?: Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            } ?: Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 CircularProgressIndicator()
             }
         }
