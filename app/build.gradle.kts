@@ -54,6 +54,9 @@ kotlin {
 }
 
 dependencies {
+    // paggin 3
+    implementation("androidx.paging:paging-runtime:3.2.1")
+    implementation("androidx.paging:paging-compose:3.2.1")
 
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     // Ktor unificado en 3.2.1

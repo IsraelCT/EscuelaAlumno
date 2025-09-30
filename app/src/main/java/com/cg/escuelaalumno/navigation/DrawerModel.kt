@@ -6,7 +6,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class SeccionDrawer {
-    PERFIL, CALIFICACIONES, MATERIAS, PLAN
+    PERFIL, CALIFICACIONES, MATERIAS, PLAN, RECIBO
 }
 
 data class ItemDrawer(
@@ -18,6 +18,7 @@ data class ItemDrawer(
 val itemsDrawer = listOf(
     ItemDrawer(SeccionDrawer.PERFIL, Icons.Default.Person, "Perfil"),
     ItemDrawer(SeccionDrawer.CALIFICACIONES, Icons.Default.Grade, "Calificaciones"),
-    ItemDrawer(SeccionDrawer.MATERIAS, Icons.Default.Book, "Materias / Calendario"),
-    ItemDrawer(SeccionDrawer.PLAN, Icons.Default.School, "Plan de estudio")
+    ItemDrawer(SeccionDrawer.MATERIAS, Icons.Default.Book, " Calendario"),
+    ItemDrawer(SeccionDrawer.PLAN, Icons.Default.School, "Plan de estudio"),
+    ItemDrawer(SeccionDrawer.RECIBO,Icons.Default.Notes,"Recibo")
 )

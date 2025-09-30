@@ -16,4 +16,6 @@ sealed class Pantalla(val ruta: String) {
     object Calificaciones : Pantalla("calificaciones")
     object Materias : Pantalla("materias")
     object Plan : Pantalla("plan")
+
+    object Recibo : Pantalla("Recibo")
 }

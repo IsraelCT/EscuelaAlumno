@@ -45,18 +45,36 @@ import com.cg.escuelaalumno.navigation.Pantalla
 import com.cg.escuelaalumno.navigation.SeccionDrawer
 import com.cg.escuelaalumno.navigation.itemsDrawer
 import com.cg.escuelaalumno.viewModel.EscuelaAlumnoVM
+import com.cg.escuelaalumno.viewModel.ReciboViewModel
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.temporal.WeekFields
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeDrawerView(
     alumnoId: Int,
-    navController: NavController, // 👈 lo recibimos para navegar al login
+    navController: NavController, //
     context: Context = LocalContext.current
 ) {
     val viewModel: EscuelaAlumnoVM = hiltViewModel()
+    val reciboVM: ReciboViewModel = hiltViewModel()
     LaunchedEffect(alumnoId) { viewModel.fetchAlumnoPorId(alumnoId) }
+
+
     val alumnoState = viewModel.escuelaAlumno.collectAsStateWithLifecycle().value
+    LaunchedEffect(alumnoState) {
+        alumnoState?.let { reciboVM.cargarRecibosDesdeAlumno(it) }
+
+
+    }
+
+
+
+    // 🔹 Calcular semana actual del calendario ISO
+    val semanaActual = remember {
+        LocalDate.now().get(WeekFields.ISO.weekOfYear())
+    }
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -130,7 +148,7 @@ fun HomeDrawerView(
                         .padding(24.dp)
                 ) {
                     when (seccionActiva.value) {
-                        SeccionDrawer.PERFIL -> PerfilCard(alumno)
+                        SeccionDrawer.PERFIL -> PerfilCard(alumno = alumno, semanaActual =semanaActual )
                         SeccionDrawer.CALIFICACIONES -> CalificacionesView(alumnoId)
                         SeccionDrawer.MATERIAS -> {
                             alumno.materias.forEach {
@@ -142,6 +160,11 @@ fun HomeDrawerView(
                             Text("Duración: ${alumno.planEstudio.duracionPlan} meses")
                             Text("Especialidad: ${alumno.planEstudio.especialidad}")
                         }
+                        SeccionDrawer.RECIBO -> {
+
+                            ReciboListScreen(viewModel = reciboVM)
+                        }
+
                     }
                 }
             } ?: Box(

@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.cg.escuelaalumno.view.GrupoView
 import com.cg.escuelaalumno.view.HomeDrawerView
 import com.cg.escuelaalumno.view.LoginView
+import com.cg.escuelaalumno.view.ReciboListScreen
 
 @Composable
 fun AppNavHost(innerPadding: PaddingValues) {
@@ -53,5 +54,15 @@ fun AppNavHost(innerPadding: PaddingValues) {
                 GrupoView(alumnoId)
             }
         }
+
+
+
+        // Pantalla Recibo
+        composable(Pantalla.Recibo.ruta) { backStackEntry ->
+            val alumnoId = backStackEntry.arguments?.getString("")?.toIntOrNull()
+            if (alumnoId != null) {
+                ReciboListScreen()
+            }
+        }
     }
-}
+    }

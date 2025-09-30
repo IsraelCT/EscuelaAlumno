@@ -19,7 +19,7 @@ fun CalificacionesView(alumnoId: Int) {
 
     alumnoState?.let { alumno ->
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("📋 Calificaciones", style = MaterialTheme.typography.titleLarge)
+            Text(" Calificaciones", style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.height(16.dp))
 
             alumno.calificaciones.forEach { calificacion ->
