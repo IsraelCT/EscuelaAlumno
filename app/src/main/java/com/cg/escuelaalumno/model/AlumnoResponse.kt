@@ -6,6 +6,9 @@ data class AlumnoResponse(
     val materias: List<MateriaModel>,
     val planEstudio: PlanEstudioModel,
     val calificaciones: List<CalificacionesModel>,
-    val recibos : List<ReciboModel>
+    val recibos : List<ReciboModel>,
+    val personal : List<PersonalModel>,
+    val calendario: List<CalendarioModel>
+
 
 )

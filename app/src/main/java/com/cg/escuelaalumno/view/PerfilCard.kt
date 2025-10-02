@@ -59,6 +59,8 @@ fun PerfilCard(alumno: AlumnoResponse) {
     }
 }
 
+ */
+
 
 @Composable
 fun PerfilCard(alumno: AlumnoResponse, semanaActual: Int) {
@@ -94,7 +96,13 @@ fun PerfilCard(alumno: AlumnoResponse, semanaActual: Int) {
             Spacer(modifier = Modifier.height(10.dp))
             Text("Horario: ${alumno.grupo.horario}", style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(10.dp))
-            Text("Docente: ${alumno.grupo.docente}", style = MaterialTheme.typography.bodyMedium)
+            //
+            Text(
+                text = "Docente: ${alumno.personal.firstOrNull()?.idNombre ?: "Sin asignar"}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -119,7 +127,8 @@ fun PerfilCard(alumno: AlumnoResponse, semanaActual: Int) {
     }
 }
 
- */
+
+/*
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -206,3 +215,5 @@ fun PerfilCard(alumno: AlumnoResponse, semanaActual: Int) {
         }
     }
 }
+
+ */
