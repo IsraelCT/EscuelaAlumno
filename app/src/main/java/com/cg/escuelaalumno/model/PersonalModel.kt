@@ -5,5 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PersonalModel(
     val idPersonal: Int,
-    val idNombre: String?
+    val idNombre: String?,
+    val idApellido: String?
 )

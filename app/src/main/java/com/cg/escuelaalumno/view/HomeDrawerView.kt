@@ -84,7 +84,7 @@ fun HomeDrawerView(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(2.dp))
 
                 // Items normales del Drawer
                 itemsDrawer.forEach { item ->
@@ -150,20 +150,15 @@ fun HomeDrawerView(
                     when (seccionActiva.value) {
                         SeccionDrawer.PERFIL -> PerfilCard(alumno = alumno, semanaActual =semanaActual )
                         SeccionDrawer.CALIFICACIONES -> CalificacionesView(alumnoId)
-                        SeccionDrawer.MATERIAS -> {
-                            alumno.materias.forEach {
-                                Text("- ${it.nombre}: ${it.duracion} semanas")
-                            }
-                        }
-                        SeccionDrawer.PLAN -> {
-                            Text("Plan: ${alumno.planEstudio.plansEstudio}")
-                            Text("Duración: ${alumno.planEstudio.duracionPlan} meses")
-                            Text("Especialidad: ${alumno.planEstudio.especialidad}")
-                        }
+
                         SeccionDrawer.RECIBO -> {
 
-                            ReciboListScreen(viewModel = reciboVM)
+                            ReciboScreen(alumnoId = alumnoId)
                         }
+
+                        //Calendariodbjkdfk
+                        SeccionDrawer.CALENDARIO ->
+                            CalendarioView(alumnoId)
 
                     }
                 }

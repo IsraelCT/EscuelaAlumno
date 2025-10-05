@@ -5,13 +5,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.cg.escuelaalumno.view.CalendarioView
 import com.cg.escuelaalumno.view.GrupoView
 import com.cg.escuelaalumno.view.HomeDrawerView
 import com.cg.escuelaalumno.view.LoginView
-import com.cg.escuelaalumno.view.ReciboListScreen
+
+import com.cg.escuelaalumno.view.ReciboScreen
+import com.cg.escuelaalumno.view.RecibosTablaView
 
 @Composable
 fun AppNavHost(innerPadding: PaddingValues) {
@@ -57,12 +63,24 @@ fun AppNavHost(innerPadding: PaddingValues) {
 
 
 
-        // Pantalla Recibo
-        composable(Pantalla.Recibo.ruta) { backStackEntry ->
-            val alumnoId = backStackEntry.arguments?.getString("")?.toIntOrNull()
+        composable(
+            route = "Recibo/{alumnoId}",
+            arguments = listOf(navArgument("alumnoId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val alumnoId = backStackEntry.arguments?.getInt("alumnoId")
             if (alumnoId != null) {
-                ReciboListScreen()
+                ReciboScreen(alumnoId = alumnoId)
             }
         }
+
+        //Pantalla Calendario
+
+        composable(Pantalla.Calendario.ruta) { backStackEntry ->
+            val alumnoId = backStackEntry.arguments?.getString("")?.toIntOrNull()
+            if (alumnoId != null) {
+                CalendarioView(alumnoId)
+            }
+        }
+
     }
     }

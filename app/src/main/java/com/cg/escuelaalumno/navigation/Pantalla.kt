@@ -14,8 +14,15 @@ sealed class Pantalla(val ruta: String) {
     }
 
     object Calificaciones : Pantalla("calificaciones")
-    object Materias : Pantalla("materias")
-    object Plan : Pantalla("plan")
+    //object Materias : Pantalla("materias")
+    //object Plan : Pantalla("plan")
 
-    object Recibo : Pantalla("Recibo")
+    object Recibo : Pantalla("Recibo/{alumnoId}") {
+        fun crearRuta(alumnoId: Int) = "Recibo/$alumnoId"
+    }
+
+    object Calendario : Pantalla("calendario/{alumnoId}") {
+        fun crearRuta(alumnoId: String) = "calendario/$alumnoId"
+    }
+
 }

@@ -98,7 +98,7 @@ fun PerfilCard(alumno: AlumnoResponse, semanaActual: Int) {
             Spacer(modifier = Modifier.height(10.dp))
             //
             Text(
-                text = "Docente: ${alumno.personal.firstOrNull()?.idNombre ?: "Sin asignar"}",
+                text = "Docente: ${alumno.personal.firstOrNull()?.idNombre ?: "Sin asignar"} ${alumno.personal.firstOrNull()?.idApellido ?: "Sin asignar "}",
                 style = MaterialTheme.typography.bodyMedium
             )
 
@@ -106,7 +106,7 @@ fun PerfilCard(alumno: AlumnoResponse, semanaActual: Int) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 👇 Aquí mostramos el estado de pagos
+
             Text(
                 "Semana $semanaActual/52   Adeudo: ${resultado.adeudo}",
                 style = MaterialTheme.typography.bodyMedium,
