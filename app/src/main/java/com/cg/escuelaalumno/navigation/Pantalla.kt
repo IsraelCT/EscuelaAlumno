@@ -6,7 +6,14 @@ sealed class Pantalla(val ruta: String) {
     // Home recibe idAlumno como argumento
     object Home : Pantalla("home/{idAlumno}") {
         fun crearRuta(idAlumno: String) = "home/$idAlumno"
+        val rutaConArgumento = "home/{idAlumno}"
+
     }
+    object RegistroContrasena : Pantalla("registro_contrasena/{idAlumno}") {
+        fun crearRuta(idAlumno: String) = "registro_contrasena/$idAlumno"
+        val rutaConArgumento = "registro_contrasena/{idAlumno}"
+    }
+
 
     // Grupo también puede recibir idAlumno si lo necesitas
     object Grupo : Pantalla("grupo/{alumnoId}") {

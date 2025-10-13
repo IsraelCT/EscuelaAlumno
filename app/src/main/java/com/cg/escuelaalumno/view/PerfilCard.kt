@@ -63,8 +63,9 @@ fun PerfilCard(alumno: AlumnoResponse) {
 
 
 @Composable
-fun PerfilCard(alumno: AlumnoResponse, semanaActual: Int) {
-    val resultado = calcularAdeudo(alumno, semanaActual)
+fun PerfilCard(alumno: AlumnoResponse, semanaActual: Int,semanaInicioCurso:Int, esSabadoHoraCorte: Boolean ) {
+
+    val resultado = calcularAdeudo(alumno, semanaActual,semanaInicioCurso,esSabadoHoraCorte )
 
     Card(
         modifier = Modifier
@@ -97,8 +98,11 @@ fun PerfilCard(alumno: AlumnoResponse, semanaActual: Int) {
             Text("Horario: ${alumno.grupo.horario}", style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(10.dp))
             //
+            val docente = alumno.personal.firstOrNull()
+            val nombreDocente = listOfNotNull(docente?.idNombre, docente?.idApellido).joinToString(" ")
+
             Text(
-                text = "Docente: ${alumno.personal.firstOrNull()?.idNombre ?: "Sin asignar"} ${alumno.personal.firstOrNull()?.idApellido ?: "Sin asignar "}",
+                text = "Docente: ${if (nombreDocente.isNotBlank()) nombreDocente else "Sin asignar"}",
                 style = MaterialTheme.typography.bodyMedium
             )
 

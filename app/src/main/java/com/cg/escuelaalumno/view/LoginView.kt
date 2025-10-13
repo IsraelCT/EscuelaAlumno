@@ -1,6 +1,7 @@
 package com.cg.escuelaalumno.view
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -21,17 +22,18 @@ import com.cg.escuelaalumno.viewModel.EscuelaAlumnoVM
 import com.cg.escuelaalumno.viewModel.LoginViewModel
 import com.cg.escuelaalumno.R
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextDecoration
 
 @Composable
 fun LoginView(
     viewModel: LoginViewModel = hiltViewModel(),
-    onLoginSuccess: (LoginResponse) -> Unit
+    onLoginSuccess: (LoginResponse) -> Unit,
+    onNavigateToRegister: (String) -> Unit // callback para navegar
 ) {
     var idAlumno by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     val state = viewModel.loginState
-
 
     Box(
         modifier = Modifier
@@ -82,6 +84,23 @@ fun LoginView(
             ) {
                 Text("Iniciar sesión")
             }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Enlace para registrar/actualizar contraseña
+            Text(
+                text = "¿Primera vez? Registra o actualiza tu contraseña",
+                color = Color.Blue,
+                textDecoration = TextDecoration.Underline,
+                modifier = Modifier.clickable {
+                    // Si el usuario ya escribió su ID, lo pasamos
+                    // Si no, mandamos cadena vacía y se pedirá en la otra pantalla
+                    val idSeguro = if (idAlumno.isBlank()) "nuevo" else idAlumno
+                    onNavigateToRegister(idSeguro)
+
+                }
+            )
+
 
             Spacer(Modifier.height(16.dp))
 

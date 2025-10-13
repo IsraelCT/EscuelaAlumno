@@ -47,7 +47,9 @@ import com.cg.escuelaalumno.navigation.itemsDrawer
 import com.cg.escuelaalumno.viewModel.EscuelaAlumnoVM
 import com.cg.escuelaalumno.viewModel.ReciboViewModel
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.temporal.WeekFields
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,10 +72,14 @@ fun HomeDrawerView(
     }
 
 
-
+    val semanaInicioCurso =37
     // 🔹 Calcular semana actual del calendario ISO
     val semanaActual = remember {
         LocalDate.now().get(WeekFields.ISO.weekOfYear())
+    }
+    fun esSabadoHoraCorte(): Boolean {
+        val ahora = LocalDateTime.now()
+        return ahora.dayOfWeek == DayOfWeek.SATURDAY && ahora.hour >= 8
     }
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -148,7 +154,7 @@ fun HomeDrawerView(
                         .padding(24.dp)
                 ) {
                     when (seccionActiva.value) {
-                        SeccionDrawer.PERFIL -> PerfilCard(alumno = alumno, semanaActual =semanaActual )
+                        SeccionDrawer.PERFIL -> PerfilCard(alumno = alumno, semanaActual =semanaActual, semanaInicioCurso =semanaInicioCurso , esSabadoHoraCorte = esSabadoHoraCorte() )
                         SeccionDrawer.CALIFICACIONES -> CalificacionesView(alumnoId)
 
                         SeccionDrawer.RECIBO -> {

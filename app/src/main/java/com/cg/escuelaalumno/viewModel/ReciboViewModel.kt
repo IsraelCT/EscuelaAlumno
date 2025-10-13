@@ -18,9 +18,7 @@ import javax.inject.Inject
 class ReciboViewModel @Inject constructor() : ViewModel() {
 
     private val _recibos = MutableStateFlow<List<ReciboModel>>(emptyList())
-    val recibosPaged = _recibos.map { recibos ->
-        ReciboPager().createPager(recibos).flow.cachedIn(viewModelScope)
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, flowOf(PagingData.empty()))
+
 
     fun cargarRecibosDesdeAlumno(alumno: AlumnoResponse) {
         _recibos.value = alumno.recibos

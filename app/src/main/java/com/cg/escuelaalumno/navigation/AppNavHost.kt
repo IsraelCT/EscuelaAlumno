@@ -15,6 +15,7 @@ import com.cg.escuelaalumno.view.CalendarioView
 import com.cg.escuelaalumno.view.GrupoView
 import com.cg.escuelaalumno.view.HomeDrawerView
 import com.cg.escuelaalumno.view.LoginView
+import com.cg.escuelaalumno.view.PasswordRegisterView
 
 import com.cg.escuelaalumno.view.ReciboScreen
 import com.cg.escuelaalumno.view.RecibosTablaView
@@ -29,16 +30,37 @@ fun AppNavHost(innerPadding: PaddingValues) {
         startDestination = Pantalla.Login.ruta,
         modifier = Modifier.padding(innerPadding)
     ) {
-
         // Pantalla de Login
         composable(Pantalla.Login.ruta) {
-            LoginView { response ->
-                // response contiene token y idAlumno
-                navController.navigate(Pantalla.Home.crearRuta(response.idAlumno)) {
-                    popUpTo(Pantalla.Login.ruta) { inclusive = true }
+            LoginView(
+                onLoginSuccess = { response ->
+                    navController.navigate(Pantalla.Home.crearRuta(response.idAlumno)) {
+                        popUpTo(Pantalla.Login.ruta) { inclusive = true }
+                    }
+                },
+                onNavigateToRegister = { idAlumno ->
+                    navController.navigate(Pantalla.RegistroContrasena.crearRuta(idAlumno))
                 }
-            }
+            )
         }
+        // Pantalla de Registro/Actualización de contraseña
+        composable(
+            route = Pantalla.RegistroContrasena.rutaConArgumento,
+            arguments = listOf(navArgument("idAlumno") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val idAlumno = backStackEntry.arguments?.getString("idAlumno") ?: ""
+            PasswordRegisterView(
+                idAlumno = idAlumno,
+                onPasswordRegistered = {
+                    navController.popBackStack() // Regresa al login tras registrar
+                }
+            )
+        }
+
+
+
+
+
 
         // Pantalla Home
         composable(Pantalla.Home.ruta) { backStackEntry ->

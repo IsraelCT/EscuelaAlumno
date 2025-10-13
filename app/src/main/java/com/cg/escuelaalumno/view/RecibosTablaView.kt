@@ -35,66 +35,60 @@ import com.cg.escuelaalumno.viewModel.ReciboViewModel
 @Composable
 fun RecibosTablaView(
     alumno: AlumnoResponse,
-    semanaActual: Int
+    semanaActual: Int,
+    semanaInicioCurso: Int,
+    esSabadoHoraCorte: Boolean
 ) {
-    val adeudoResult = calcularAdeudo(alumno, semanaActual)
+    val adeudoResult = calcularAdeudo(
+        alumno = alumno,
+        semanaActual = semanaActual,
+        semanaInicioCurso = semanaInicioCurso,
+        esSabadoHoraCorte = esSabadoHoraCorte
+    )
 
-    // Ordenamos los recibos: último pago primero
-    val recibosOrdenados = alumno.recibos.sortedByDescending { it.folioPago }
-
-    // Último pago
+    val recibosOrdenados = alumno.recibos.sortedByDescending { it.fecha }
     val ultimoRecibo = recibosOrdenados.firstOrNull()
 
     Column(modifier = Modifier.fillMaxSize()) {
 
-
-            Column(modifier = Modifier.padding(4 .dp)) {
-                Text(
-                    "Último pago: ${ultimoRecibo?.semana ?: "-"} / ${ultimoRecibo?.ano ?: "-"}",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text("Semana actual: $semanaActual", style = MaterialTheme.typography.bodyMedium)
-                Text(
-                    "Semanas pendientes: ${adeudoResult.adeudo} / ${adeudoResult.adeudo * 150}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (adeudoResult.adeudo > 0) Color.Red else Color.Green
-                )
-            }
-
+        Column(modifier = Modifier.padding(4.dp)) {
+            Text(
+                "Último pago: ${ultimoRecibo?.semana?.let { if (it == 0) 37 else it } ?: "-"} / ${ultimoRecibo?.ano ?: "-"}",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text("Semana actual: $semanaActual", style = MaterialTheme.typography.bodyMedium)
+            Text(
+                "Semanas pendientes: ${adeudoResult.adeudo} / ${adeudoResult.adeudo * 150}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (adeudoResult.adeudo > 0) Color.Red else Color.Green
+            )
+        }
 
         Spacer(Modifier.height(16.dp))
 
-        // Encabezado de tabla
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color(0xFFEEEEEE))
                 .padding(8.dp)
         ) {
-
             Text("Folio", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold)
-
             Text("Semana", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold)
-
             Text("Fecha/Hora", modifier = Modifier.weight(2f), fontWeight = FontWeight.Bold)
         }
         Divider()
 
-        // Filas de recibos (último → primero)
         LazyColumn {
-            itemsIndexed(recibosOrdenados) { index, recibo ->
+            itemsIndexed(recibosOrdenados) { _, recibo ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 6.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-
                     Text("${recibo.folioPago}", modifier = Modifier.weight(1f))
-
-                    Text("${recibo.semana}", modifier = Modifier.weight(1f))
-
-                    Text("${recibo.fecha} ", modifier = Modifier.weight(2f))
+                    Text("${if (recibo.semana == 0) 37 else recibo.semana}", modifier = Modifier.weight(1f))
+                    Text("${recibo.fecha}", modifier = Modifier.weight(2f))
                 }
                 Divider()
             }

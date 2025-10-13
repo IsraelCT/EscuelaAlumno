@@ -54,6 +54,7 @@ kotlin {
 }
 
 dependencies {
+    implementation("org.slf4j:slf4j-simple:2.0.7")
     // paggin 3
     implementation("androidx.paging:paging-runtime:3.2.1")
     implementation("androidx.paging:paging-compose:3.2.1")
