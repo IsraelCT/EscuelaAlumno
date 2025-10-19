@@ -44,6 +44,8 @@ import com.cg.escuelaalumno.di.dataStore
 import com.cg.escuelaalumno.navigation.Pantalla
 import com.cg.escuelaalumno.navigation.SeccionDrawer
 import com.cg.escuelaalumno.navigation.itemsDrawer
+import com.cg.escuelaalumno.utils.obtenerFechaCorte
+
 import com.cg.escuelaalumno.viewModel.EscuelaAlumnoVM
 import com.cg.escuelaalumno.viewModel.ReciboViewModel
 import kotlinx.coroutines.launch
@@ -56,31 +58,24 @@ import java.time.temporal.WeekFields
 @Composable
 fun HomeDrawerView(
     alumnoId: Int,
-    navController: NavController, //
+    navController: NavController,
     context: Context = LocalContext.current
 ) {
     val viewModel: EscuelaAlumnoVM = hiltViewModel()
     val reciboVM: ReciboViewModel = hiltViewModel()
+
+    // Cargar alumno
     LaunchedEffect(alumnoId) { viewModel.fetchAlumnoPorId(alumnoId) }
-
-
     val alumnoState = viewModel.escuelaAlumno.collectAsStateWithLifecycle().value
+
+    // Cargar recibos cuando cambia el alumno
     LaunchedEffect(alumnoState) {
         alumnoState?.let { reciboVM.cargarRecibosDesdeAlumno(it) }
-
-
     }
 
-
-    val semanaInicioCurso =37
-    // 🔹 Calcular semana actual del calendario ISO
-    val semanaActual = remember {
-        LocalDate.now().get(WeekFields.ISO.weekOfYear())
-    }
-    fun esSabadoHoraCorte(): Boolean {
-        val ahora = LocalDateTime.now()
-        return ahora.dayOfWeek == DayOfWeek.SATURDAY && ahora.hour >= 8
-    }
+    // 🔹 Semana actual ISO del calendario
+    val fechaActual = LocalDateTime.now()
+    val semanaActual = remember { LocalDate.now().get(WeekFields.ISO.weekOfYear()) }
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -127,7 +122,6 @@ fun HomeDrawerView(
                             navController.navigate(Pantalla.Login.ruta) {
                                 popUpTo(Pantalla.Home.ruta) { inclusive = true }
                             }
-
                         }
                     },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -154,18 +148,22 @@ fun HomeDrawerView(
                         .padding(24.dp)
                 ) {
                     when (seccionActiva.value) {
-                        SeccionDrawer.PERFIL -> PerfilCard(alumno = alumno, semanaActual =semanaActual, semanaInicioCurso =semanaInicioCurso , esSabadoHoraCorte = esSabadoHoraCorte() )
+                        SeccionDrawer.PERFIL -> PerfilCard(
+                            alumno = alumno,
+                            semanaActual = semanaActual,
+                            fechaActual = fechaActual,
+                            obtenerFechaCorte = ::obtenerFechaCorte
+
+
+                        )
+
+
+
                         SeccionDrawer.CALIFICACIONES -> CalificacionesView(alumnoId)
 
-                        SeccionDrawer.RECIBO -> {
+                        SeccionDrawer.RECIBO -> ReciboScreen(alumnoId = alumnoId)
 
-                            ReciboScreen(alumnoId = alumnoId)
-                        }
-
-                        //Calendariodbjkdfk
-                        SeccionDrawer.CALENDARIO ->
-                            CalendarioView(alumnoId)
-
+                        SeccionDrawer.CALENDARIO -> CalendarioView(alumnoId)
                     }
                 }
             } ?: Box(

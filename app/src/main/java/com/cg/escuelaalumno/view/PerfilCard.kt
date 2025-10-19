@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 
 import com.cg.escuelaalumno.model.AlumnoResponse
 import com.cg.escuelaalumno.utils.calcularAdeudo
+import java.time.LocalDateTime
 
 /*
 @Composable
@@ -60,12 +61,19 @@ fun PerfilCard(alumno: AlumnoResponse) {
 }
 
  */
-
-
 @Composable
-fun PerfilCard(alumno: AlumnoResponse, semanaActual: Int,semanaInicioCurso:Int, esSabadoHoraCorte: Boolean ) {
-
-    val resultado = calcularAdeudo(alumno, semanaActual,semanaInicioCurso,esSabadoHoraCorte )
+fun PerfilCard(
+    alumno: AlumnoResponse,
+    semanaActual: Int, // semana ISO actual
+    fechaActual: LocalDateTime,
+    obtenerFechaCorte: (Int, Int) -> LocalDateTime
+) {
+    val resultado = calcularAdeudo(
+        alumno = alumno,
+        semanaActual = semanaActual,
+        fechaActual = fechaActual,
+        obtenerFechaCorte = obtenerFechaCorte
+    )
 
     Card(
         modifier = Modifier
@@ -97,7 +105,7 @@ fun PerfilCard(alumno: AlumnoResponse, semanaActual: Int,semanaInicioCurso:Int, 
             Spacer(modifier = Modifier.height(10.dp))
             Text("Horario: ${alumno.grupo.horario}", style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(10.dp))
-            //
+
             val docente = alumno.personal.firstOrNull()
             val nombreDocente = listOfNotNull(docente?.idNombre, docente?.idApellido).joinToString(" ")
 
@@ -106,27 +114,27 @@ fun PerfilCard(alumno: AlumnoResponse, semanaActual: Int,semanaInicioCurso:Int, 
                 style = MaterialTheme.typography.bodyMedium
             )
 
-
-
             Spacer(modifier = Modifier.height(16.dp))
 
-
+            // 🔹 Resumen de adeudo
             Text(
                 "Semana $semanaActual/52   Adeudo: ${resultado.adeudo}",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = if (resultado.adeudo > 0) Color.Red else Color(0xFF388E3C)
             )
+
+            // 🔹 Mostrar detalle de semanas faltantes (semana/año)
             if (resultado.semanasFaltantes.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    "Semanas faltantes: ${resultado.semanasFaltantes.joinToString(", ")}",
+                    "Semanas faltantes: ${
+                        resultado.semanasFaltantes.joinToString(", ") { (anio, semana) -> "$semana" }
+                    }",
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.Red
                 )
             }
-
-
         }
     }
 }

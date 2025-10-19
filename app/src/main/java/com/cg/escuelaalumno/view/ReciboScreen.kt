@@ -20,13 +20,19 @@ import com.cg.escuelaalumno.viewModel.EscuelaAlumnoVM
 import com.cg.escuelaalumno.viewModel.ReciboViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
+import com.cg.escuelaalumno.utils.obtenerAnioSemanaISO
+import com.cg.escuelaalumno.utils.obtenerFechaCorte
+import com.cg.escuelaalumno.utils.obtenerSemanaActualISO
+
+
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.time.temporal.WeekFields
 import java.util.Locale
 
-
+/*
 @Composable
 fun ReciboScreen(
     alumnoId: Int,
@@ -45,30 +51,67 @@ fun ReciboScreen(
         }
     }
 
-    fun esSabadoHoraCorte(): Boolean {
-        val ahora = LocalDateTime.now()
-        return ahora.dayOfWeek == DayOfWeek.SATURDAY && ahora.hour >= 8
-    }
-
-    val semanaActual = obtenerSemanaActual()
-    val semanaInicioCurso = 37 // ← Aquí defines el inicio real del curso
+    val fechaActual = LocalDateTime.now()
+    val semanaActual = obtenerSemanaActualISO(fechaActual.toLocalDate())
 
     if (estadoAlumno != null) {
         RecibosTablaView(
             alumno = estadoAlumno!!,
             semanaActual = semanaActual,
-            semanaInicioCurso = semanaInicioCurso,
-            esSabadoHoraCorte = esSabadoHoraCorte()
+            fechaActual = fechaActual,
+            obtenerFechaCorte = ::obtenerFechaCorte
         )
     } else {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
             CircularProgressIndicator()
         }
     }
 }
 
-fun obtenerSemanaActual(): Int {
-    val hoy = LocalDate.now()
-    val weekFields = WeekFields.of(Locale("es", "MX"))
-    return hoy.get(weekFields.weekOfYear())
+
+
+ */
+
+@Composable
+fun ReciboScreen(
+    alumnoId: Int,
+    escuelaViewModel: EscuelaAlumnoVM = hiltViewModel(),
+    reciboViewModel: ReciboViewModel = hiltViewModel()
+) {
+    val estadoAlumno by escuelaViewModel.escuelaAlumno.collectAsState()
+
+    // 🔹 Cargar alumno al entrar
+    LaunchedEffect(alumnoId) {
+        escuelaViewModel.fetchAlumnoPorId(alumnoId)
+    }
+
+    // 🔹 Cargar recibos cuando ya tenemos alumno
+    LaunchedEffect(estadoAlumno) {
+        estadoAlumno?.let { alumno ->
+            reciboViewModel.cargarRecibosDesdeAlumno(alumno)
+        }
+    }
+
+    // 🔹 Fecha y semana/año ISO actuales
+    val fechaActual = LocalDateTime.now()
+    val semanaActual = obtenerSemanaActualISO(fechaActual.toLocalDate())
+    val anioActual = obtenerAnioSemanaISO(fechaActual.toLocalDate())
+
+    // 🔹 Renderizado condicional
+    estadoAlumno?.let { alumno ->
+        RecibosTablaView(
+            alumno = alumno,
+            semanaActual = semanaActual,
+            fechaActual = fechaActual,
+            obtenerFechaCorte = ::obtenerFechaCorte
+        )
+    } ?: Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
 }
