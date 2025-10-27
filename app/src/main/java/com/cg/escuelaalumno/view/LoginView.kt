@@ -1,10 +1,12 @@
 package com.cg.escuelaalumno.view
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,99 +26,122 @@ import com.cg.escuelaalumno.R
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginView(
     viewModel: LoginViewModel = hiltViewModel(),
     onLoginSuccess: (LoginResponse) -> Unit,
-    onNavigateToRegister: (String) -> Unit // callback para navegar
+    onNavigateToRegister: (String) -> Unit
 ) {
+    val state = viewModel.loginState
     var idAlumno by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-
-    val state = viewModel.loginState
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            // Logo centrado
-            Image(
-                painter = painterResource(id = R.drawable.cgd),
-                contentDescription = "CG",
-                modifier = Modifier
-                    .size(220.dp)
-                    .padding(bottom = 32.dp),
-                contentScale = ContentScale.Fit
-            )
+        when (state) {
+            is LoginUiState.Idle,
+            is LoginUiState.Error -> {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(32.dp)
+                ) {
+                    // Logo minimalista
+                    Image(
+                        painter = painterResource(id = R.drawable.cgd),
+                        contentDescription = "Logo",
+                        modifier = Modifier
+                            .size(200.dp)
+                            .padding(bottom = 16.dp),
+                        contentScale = ContentScale.Fit
+                    )
 
-            // Campo ID Alumno
-            OutlinedTextField(
-                value = idAlumno,
-                onValueChange = { idAlumno = it },
-                label = { Text("ID Alumno") },
-                modifier = Modifier.fillMaxWidth()
-            )
+                    // Campo ID Alumno
+                    OutlinedTextField(
+                        value = idAlumno,
+                        onValueChange = { idAlumno = it },
+                        label = { Text("ID Alumno") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
 
-            Spacer(Modifier.height(16.dp))
+                    // Campo Contraseña
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Contraseña") },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
 
-            // Campo Contraseña
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Contraseña") },
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
-            )
+                    // Botón principal con estilo M3
+                    Button(
+                        onClick = { viewModel.login(idAlumno, password) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            "Entrar",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
 
-            Spacer(Modifier.height(24.dp))
+                    // Texto de registro minimalista
+                    TextButton(
+                        onClick = {
+                            val idSeguro = if (idAlumno.isBlank()) "nuevo" else idAlumno
+                            onNavigateToRegister(idSeguro)
+                        }
+                    ) {
+                        Text(
+                            "Registrar / Recuperar contraseña",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    }
 
-            // Botón de login
-            Button(
-                onClick = { viewModel.login(idAlumno, password) },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Iniciar sesión")
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            // Enlace para registrar/actualizar contraseña
-            Text(
-                text = "¿Primera vez? Registra o actualiza tu contraseña",
-                color = Color.Blue,
-                textDecoration = TextDecoration.Underline,
-                modifier = Modifier.clickable {
-                    // Si el usuario ya escribió su ID, lo pasamos
-                    // Si no, mandamos cadena vacía y se pedirá en la otra pantalla
-                    val idSeguro = if (idAlumno.isBlank()) "nuevo" else idAlumno
-                    onNavigateToRegister(idSeguro)
-
-                }
-            )
-
-
-            Spacer(Modifier.height(16.dp))
-
-            // Estado de login
-            when (state) {
-                is LoginUiState.Loading -> CircularProgressIndicator()
-                is LoginUiState.Success -> {
-                    LaunchedEffect(state.response) {
-                        onLoginSuccess(state.response)
+                    if (state is LoginUiState.Error) {
+                        Text(
+                            "Error: ${state.message}",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
                 }
-                is LoginUiState.Error -> Text(
-                    "Error: ${state.message}",
-                    color = Color.Red
-                )
-                LoginUiState.Idle -> {}
+            }
+
+            is LoginUiState.Loading -> {
+                // Pantalla de carga con Material 3
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        "Entrando...",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+            }
+
+            is LoginUiState.Success -> {
+                LaunchedEffect(state.response) {
+                    onLoginSuccess(state.response)
+                }
             }
         }
     }

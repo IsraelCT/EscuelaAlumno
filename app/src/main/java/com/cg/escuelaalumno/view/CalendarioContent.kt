@@ -5,11 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,13 +21,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.cg.escuelaalumno.model.AlumnoModel
 import com.cg.escuelaalumno.model.AlumnoResponse
 import com.cg.escuelaalumno.model.CalendarioModel
 import com.cg.escuelaalumno.utils.safeFormat
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.time.LocalDate
-
+/*
 @Composable
 fun CalendarioContent(respuesta: AlumnoResponse) {
     val grupo = respuesta.grupo
@@ -109,6 +112,94 @@ fun CalendarioContent(respuesta: AlumnoResponse) {
                     Text(final, modifier = Modifier.weight(1f))
                 }
                 Divider()
+            }
+        }
+    }
+}
+
+ */
+
+@Composable
+fun CalendarioContent(respuesta: AlumnoResponse) {
+    val grupo = respuesta.grupo
+    val materias = respuesta.materias
+    val plan = respuesta.planEstudio
+    val personal = respuesta.personal
+    val calendario = respuesta.calendario
+
+    // Relaciones
+    val materiaPorId = materias.associateBy { it.idMateria }
+    val docenteNombre = personal.firstOrNull { it.idPersonal == grupo.docente }?.idNombre ?: "Docente no asignado"
+    val docenteApellido = personal.firstOrNull { it.idPersonal == grupo.docente }?.idApellido ?: ""
+
+    // Filtramos calendario por el grupo del alumno
+    val calendarioDelGrupo = calendario.filter { it.grupo == grupo.idGrupo }
+
+    // Formato de salida
+    val formatoSalida = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+
+        // 🔹 Encabezado institucional
+        Text(
+            text = "Calendario del grupo ${grupo.clave}",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Spacer(Modifier.height(4.dp))
+        Text("Docente: $docenteNombre $docenteApellido", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("Horario: ${grupo.horario}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("Plan de estudio: ${plan.plansEstudio}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            "Fecha de inicio: ${safeFormat(grupo.fInicio, formatoSalida)}",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        // 🔹 Encabezado de tabla
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .padding(vertical = 8.dp, horizontal = 12.dp)
+        ) {
+            Text("Materia", modifier = Modifier.weight(2f), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+            Text("Semanas", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+            Text("F.Inicio", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+            Text("F.Final", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+        }
+        Divider(color = MaterialTheme.colorScheme.outlineVariant)
+
+        // 🔹 Filas
+        LazyColumn {
+            itemsIndexed(calendarioDelGrupo) { index, item ->
+                val materia = item.materia?.let { materiaPorId[it] }
+                val nombreMateria = materia?.nombre ?: "Materia desconocida"
+                val semanas = materia?.duracion?.toString() ?: "-"
+                val inicio = safeFormat(item.fInicio, formatoSalida)
+                val final = safeFormat(item.fFinal, formatoSalida)
+
+                val rowColor = if (index % 2 == 0)
+                    MaterialTheme.colorScheme.surface
+                else
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f)
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(rowColor)
+                        .padding(vertical = 8.dp, horizontal = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(nombreMateria, modifier = Modifier.weight(2f), style = MaterialTheme.typography.bodyMedium)
+                    Text(semanas, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                    Text(inicio, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                    Text(final, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                }
+                Divider(color = MaterialTheme.colorScheme.outlineVariant)
             }
         }
     }

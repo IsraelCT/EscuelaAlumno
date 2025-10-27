@@ -61,10 +61,11 @@ fun PerfilCard(alumno: AlumnoResponse) {
 }
 
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PerfilCard(
     alumno: AlumnoResponse,
-    semanaActual: Int, // semana ISO actual
+    semanaActual: Int,
     fechaActual: LocalDateTime,
     obtenerFechaCorte: (Int, Int) -> LocalDateTime
 ) {
@@ -75,64 +76,72 @@ fun PerfilCard(
         obtenerFechaCorte = obtenerFechaCorte
     )
 
-    Card(
+    ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .height(300.dp)
             .padding(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Encabezado con ícono y nombre
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = "Perfil",
-                    tint = Color(0xFF3F51B5),
-                    modifier = Modifier.size(32.dp)
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(36.dp)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = "${alumno.alumno.nombre} ${alumno.alumno.apellidos}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Divider(color = MaterialTheme.colorScheme.outlineVariant)
 
+            // Datos básicos
             Text("Grupo: ${alumno.grupo.clave}", style = MaterialTheme.typography.bodyMedium)
-            Spacer(modifier = Modifier.height(10.dp))
             Text("Horario: ${alumno.grupo.horario}", style = MaterialTheme.typography.bodyMedium)
-            Spacer(modifier = Modifier.height(10.dp))
 
             val docente = alumno.personal.firstOrNull()
             val nombreDocente = listOfNotNull(docente?.idNombre, docente?.idApellido).joinToString(" ")
-
             Text(
                 text = "Docente: ${if (nombreDocente.isNotBlank()) nombreDocente else "Sin asignar"}",
                 style = MaterialTheme.typography.bodyMedium
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // 🔹 Resumen de adeudo
-            Text(
-                "Semana $semanaActual/52   Adeudo: ${resultado.adeudo}",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-                color = if (resultado.adeudo > 0) Color.Red else Color(0xFF388E3C)
+            // Adeudo destacado
+            AssistChip(
+                onClick = { /* podrías abrir detalle */ },
+                label = {
+                    Text("Semana $semanaActual/52 • Adeudo: ${resultado.adeudo}")
+                },
+                colors = AssistChipDefaults.assistChipColors(
+                    labelColor = if (resultado.adeudo > 0) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.primary
+                )
             )
 
-            // 🔹 Mostrar detalle de semanas faltantes (semana/año)
+            // Semanas faltantes
             if (resultado.semanasFaltantes.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     "Semanas faltantes: ${
-                        resultado.semanasFaltantes.joinToString(", ") { (anio, semana) -> "$semana" }
+                        resultado.semanasFaltantes.joinToString(", ") { (_, semana) -> "$semana" }
                     }",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.Red
+                    color = MaterialTheme.colorScheme.error
                 )
             }
         }

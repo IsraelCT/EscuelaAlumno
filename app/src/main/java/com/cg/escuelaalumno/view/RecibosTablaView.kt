@@ -119,7 +119,7 @@ fun RecibosTablaView(
 
 
  */
-
+/*
 @Composable
 fun RecibosTablaView(
     alumno: AlumnoResponse,
@@ -197,6 +197,106 @@ fun RecibosTablaView(
                     Text(recibo.fecha, modifier = Modifier.weight(2f))
                 }
                 Divider()
+            }
+        }
+    }
+}
+
+ */
+@Composable
+fun RecibosTablaView(
+    alumno: AlumnoResponse,
+    semanaActual: Int,
+    fechaActual: LocalDateTime,
+    obtenerFechaCorte: (Int, Int) -> LocalDateTime
+) {
+    val adeudoResult = calcularAdeudo(
+        alumno = alumno,
+        semanaActual = semanaActual,
+        fechaActual = fechaActual,
+        obtenerFechaCorte = obtenerFechaCorte
+    )
+
+    // Ordenamos recibos una sola vez
+    val recibosOrdenados = remember(alumno.recibos) { alumno.recibos.sortedByDescending { it.fecha } }
+    val ultimoRecibo = recibosOrdenados.firstOrNull()
+
+    Column(modifier = Modifier.fillMaxSize()) {
+
+        // 🔹 Encabezado con resumen de pagos
+        Column(modifier = Modifier.padding(8.dp)) {
+            val ultimoPagoTexto = ultimoRecibo?.let { recibo ->
+                if (recibo.semana > 0) "${recibo.semana}/${recibo.ano}" else "?/${recibo.ano}"
+            } ?: "-"
+
+            Text(
+                "Último pago: $ultimoPagoTexto",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Text(
+                "Semana actual: $semanaActual",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                "Semanas pendientes: ${adeudoResult.adeudo}",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = if (adeudoResult.adeudo > 0)
+                    MaterialTheme.colorScheme.error
+                else
+                    MaterialTheme.colorScheme.primary
+            )
+
+            if (adeudoResult.semanasFaltantes.isNotEmpty()) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "Faltan semanas: ${
+                        adeudoResult.semanasFaltantes.joinToString { (_, semana) -> "$semana" }
+                    }",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        // 🔹 Encabezado de tabla
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .padding(vertical = 8.dp, horizontal = 12.dp)
+        ) {
+            Text("Folio", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelLarge)
+            Text("Semana", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelLarge)
+            Text("Fecha/Hora", modifier = Modifier.weight(2f), style = MaterialTheme.typography.labelLarge)
+        }
+        Divider(color = MaterialTheme.colorScheme.outlineVariant)
+
+        // 🔹 Lista de recibos
+        LazyColumn {
+            itemsIndexed(recibosOrdenados) { index, recibo ->
+                val rowColor = if (index % 2 == 0)
+                    MaterialTheme.colorScheme.surface
+                else
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f)
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(rowColor)
+                        .padding(vertical = 8.dp, horizontal = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("${recibo.folioPago}", modifier = Modifier.weight(1f))
+                    Text("${recibo.semana}", modifier = Modifier.weight(1f))
+                    Text("${recibo.fecha} ${recibo.hora}", modifier = Modifier.weight(2f))
+                }
+                Divider(color = MaterialTheme.colorScheme.outlineVariant)
             }
         }
     }
